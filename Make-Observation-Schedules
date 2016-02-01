@@ -1,0 +1,307 @@
+#Only part 1 can be demo'd
+#Dataset download: https://www.dropbox.com/s/c936b8rvw3as8ux/TideData2016.csv?dl=0
+tidedata <- read.csv(file.choose())
+
+############RUN ALL UNTIL SECTION 2##################
+#Roster. Can be manipulated as people enter/leave project and script will still function
+
+FieldObservers <- c(
+  "DanielWoodrich",
+  "JessicaKerby",
+  "HannahBurley",
+  "RachelWachtendonk",
+  "KinsiClarke",
+  "NolanNewman",
+  "RavenBenko",
+  "SkyeFrench")
+
+#####################
+#User enter 
+
+Start_date <- "1/19/16"# mm/dd/yy
+End_date <-   "2/1/16"# mm/dd/yy (if day (or month?) is "0d", type in as "d")
+Sunrise_time <- "07:30" # "hh:mm"
+Sunset_time <-  "17:00" # "hh:mm"
+
+#######################################################
+
+#convert inputted date to lab member submission formats
+SD <-strsplit(Start_date, split="/")
+SD <- as.data.frame(SD)
+SD1 <- SD[1, ]
+SD2 <- SD[2, ]
+SD3 <- SD[3, ]
+SD1 <- as.vector(SD1)
+SD2 <- as.vector(SD2)
+SD3 <- as.vector(SD3)
+SD1 <- as.numeric(SD1)
+SD2 <- as.numeric(SD2)
+SD3 <- as.numeric(SD3)
+
+if (SD2 == 1) {SD2 <- "01"}
+if (SD2 == 2) {SD2 <- "02"}
+if (SD2 == 3) {SD2 <- "03"}
+if (SD2 == 4) {SD2 <- "04"}
+if (SD2 == 5) {SD2 <- "05"}
+if (SD2 == 6) {SD2 <- "06"}
+if (SD2 == 7) {SD2 <- "07"}
+if (SD2 == 8) {SD2 <- "08"}
+if (SD2 == 9) {SD2 <- "09"}
+
+if (SD1 == 1) {SD1 <- "01"}
+if (SD1 == 2) {SD1 <- "02"}
+if (SD1 == 3) {SD1 <- "03"}
+if (SD1 == 4) {SD1 <- "04"}
+if (SD1 == 5) {SD1 <- "05"}
+if (SD1 == 6) {SD1 <- "06"}
+if (SD1 == 7) {SD1 <- "07"}
+if (SD1 == 8) {SD1 <- "08"}
+if (SD1 == 9) {SD2 <- "09"}
+
+SD3 <- paste(20,SD3,sep="")
+SDalt <- paste(SD3,SD1,SD2,sep="")
+
+
+#make schedule
+ST <-strsplit(Sunrise_time, split=":")
+ST <- as.data.frame(ST)
+ST1 <- ST[1, ]
+ST2 <- ST[2, ]
+ST1 <- as.vector(ST1)
+ST2 <- as.vector(ST2)
+ST1 <- as.numeric(ST1)
+ST2 <- as.numeric(ST2)
+
+Sunrise_time <- ST1*60 + ST2
+
+SS <-strsplit(Sunset_time, split=":")
+SS <- as.data.frame(SS)
+SS1 <- SS[1, ]
+SS2 <- SS[2, ]
+SS1 <- as.vector(SS1)
+SS2 <- as.vector(SS2)
+SS1 <- as.numeric(SS1)
+SS2 <- as.numeric(SS2)
+
+Sunset_time <- (SS1*60 + SS2) - 120
+
+library(plyr)   
+
+
+
+tidedata$Time <- as.character(tidedata$Time)
+Hour <-strsplit(tidedata$Time, split=":")
+Hour <- as.data.frame(Hour)
+Hour <- Hour[1, ]
+Hour <- as.vector(Hour)
+Hour <- data.frame(t(Hour))
+tidedata <- cbind(tidedata,Hour)
+names(tidedata)[names(tidedata)=="X1"] <- "Hour"
+
+hourstring <- as.vector(tidedata$Hour)
+hourstring <- as.numeric(hourstring)
+
+tidedata$Begin_hour <- (hourstring - 1)
+tidedata$End_hour <- (hourstring + 1)
+
+Minute <-strsplit(tidedata$Time, split=":")
+Minute <- as.data.frame(Minute)
+Minute <- Minute[2, ]
+Minute <- as.vector(Minute)
+Minute <- data.frame(t(Minute))
+tidedata <- cbind(tidedata,Minute)
+names(tidedata)[names(tidedata)=="X2"] <- "Minute"
+
+minutestring <- as.vector(tidedata$Minute)
+minutestring <- as.numeric(minutestring)          
+Make17zero <- function(x) {
+  if (x<8)
+  x<-0
+  else (x <- x)
+}
+
+for(n in 1:length(minutestring)) {
+  minutestring[n] <- Make17zero(minutestring[n])
+  }
+
+Make823zero <- function(x) {
+  if (7 < x & x < 24)
+    x<-15
+  else (x <- x)
+}
+
+for(n in 1:length(minutestring)) {
+  minutestring[n] <- Make823zero(minutestring[n])
+}
+
+Make2437zero <- function(x) {
+  if (23 < x & x < 38)
+    x<-30
+  else (x <- x)
+}
+
+for(n in 1:length(minutestring)) {
+  minutestring[n] <- Make2437zero(minutestring[n])
+}
+
+Make3853zero <- function(x) {
+  if (37 < x & x < 54)
+    x<-45
+  else (x <- x)
+}
+
+for(n in 1:length(minutestring)) {
+  minutestring[n] <- Make3853zero(minutestring[n])
+}
+
+Make5460zero <- function(x) {
+  if (53 < x)
+    x <- 60
+  else (x <- x)
+}
+
+for(n in 1:length(minutestring)) {
+  minutestring[n] <- Make5460zero(minutestring[n])
+}
+
+roundminute <- as.data.frame(minutestring)
+tidedata <- cbind(tidedata,roundminute)
+names(tidedata)[names(tidedata)=="X1"] <- "Roundminute"
+
+for(n in 1:length(minutestring)) {
+  minutestring[n] <- Make5460zero(minutestring[n])
+}
+
+
+
+for(n in 1:length(minutestring)) {
+  minutestring[n] <- Make5460zero(minutestring[n])
+}
+
+Make60zero <- function(x) {
+  if (x == 60)
+    x <- 0
+  else x <- x
+}
+
+beginstring <- as.numeric(tidedata$Begin_hour)
+endstring <- as.numeric(tidedata$End_hour)
+
+Is60True <- function(x) {
+  (x==60)  
+}
+
+for(n in 1:length(minutestring)) {
+  if (Is60True(minutestring[n]))
+  beginstring[n] <- (beginstring[n]) + 1
+}
+
+for(n in 1:length(minutestring)) {
+  if (Is60True(minutestring[n]))
+    endstring[n] <- (endstring[n]) + 1
+}
+
+for(n in 1:length(minutestring)) {
+  if (Is60True(minutestring[n]))
+  minutestring[n] <- 0
+}
+
+tidedata$minutestring <- minutestring
+tidedata$Begin_hour <- beginstring
+tidedata$End_hour <- endstring
+
+tidedata$minutestring <- as.character(tidedata$minutestring)
+tidedata$minutestring[tidedata$minutestring == "0"] <- "00"
+
+tidedata$Begin_hour <- as.character(tidedata$Begin_hour)
+tidedata$Begin_hour[tidedata$Begin_hour == "0"] <- "00"
+tidedata$Begin_hour[tidedata$Begin_hour == "1"] <- "01"
+tidedata$Begin_hour[tidedata$Begin_hour == "2"] <- "02"
+tidedata$Begin_hour[tidedata$Begin_hour == "3"] <- "03"
+tidedata$Begin_hour[tidedata$Begin_hour == "4"] <- "04"
+tidedata$Begin_hour[tidedata$Begin_hour == "5"] <- "05"
+tidedata$Begin_hour[tidedata$Begin_hour == "6"] <- "06"
+tidedata$Begin_hour[tidedata$Begin_hour == "7"] <- "07"
+tidedata$Begin_hour[tidedata$Begin_hour == "8"] <- "08"
+tidedata$Begin_hour[tidedata$Begin_hour == "9"] <- "09"
+tidedata$Start_time <- paste(tidedata$Begin_hour, tidedata$minutestring, sep = ":", collapse = NULL)
+
+tidedata$End_hour <- as.character(tidedata$End_hour)
+tidedata$End_hour[tidedata$End_hour == "0"] <- "00"
+tidedata$End_hour[tidedata$End_hour == "1"] <- "01"
+tidedata$End_hour[tidedata$End_hour == "2"] <- "02"
+tidedata$End_hour[tidedata$End_hour == "3"] <- "03"
+tidedata$End_hour[tidedata$End_hour == "4"] <- "04"
+tidedata$End_hour[tidedata$End_hour == "5"] <- "05"
+tidedata$End_hour[tidedata$End_hour == "6"] <- "06"
+tidedata$End_hour[tidedata$End_hour == "7"] <- "07"
+tidedata$End_hour[tidedata$End_hour == "8"] <- "08"
+tidedata$End_hour[tidedata$End_hour == "9"] <- "09"
+tidedata$End_time <- paste(tidedata$End_hour, tidedata$minutestring, sep = ":", collapse = NULL)
+
+tidedata$Start_time <- as.character(tidedata$Start_time)
+tidedata$End_time <- as.character(tidedata$End_time)
+tidedata$Times <- paste(tidedata$Start_time,tidedata$End_time, sep = "-", collapse = NULL)
+
+tidedata$minutesfrommidnight <- (as.numeric(tidedata$Begin_hour))*60 + as.numeric(tidedata$Minute)
+
+Cuttidetable <- tidedata[tidedata$minutesfrommidnight %in% (Sunrise_time):(Sunset_time), ]
+
+Cuttidetable$formatdate <- as.Date(Cuttidetable$Date,format='%m/%d/%Y')
+
+rowstring <- seq(from =1 , to = length(Cuttidetable$Date), by =1 )
+
+Cuttidetable <- cbind(Cuttidetable, rowstring)
+
+IsDateStart <- function(x) {
+  (x == Start_date)
+}
+
+IsDateEnd <- function(x) {
+  (x == End_date)
+}
+
+startrows <- which(IsDateStart(Cuttidetable$Date), arr.in=TRUE)
+startrow <- startrows[1]
+endrows <- which(IsDateEnd(Cuttidetable$Date), arr.in=TRUE)
+endrow <- tail(endrows, n=1)
+
+
+Finaltidetable <- Cuttidetable[Cuttidetable$rowstring %in% (startrow):(endrow), ]
+
+
+Finaltidetable$Time <- NULL
+Finaltidetable$Pred.Ft. <- NULL
+Finaltidetable$Pred.cm. <- NULL
+Finaltidetable$somestupidbs <- NULL
+Finaltidetable$Hour <- NULL
+Finaltidetable$Begin_hour <- NULL
+Finaltidetable$End_hour <- NULL
+Finaltidetable$Minute <- NULL
+Finaltidetable$minutestring <- NULL
+Finaltidetable$Start_time <- NULL
+Finaltidetable$End_time <- NULL
+Finaltidetable$minutesfrommidnight <- NULL
+Finaltidetable$rowstring <- NULL
+Finaltidetable$row.names <- NULL
+Finaltidetable$formatdate <- NULL
+Finaltidetable$Observers <- ""
+
+#generate the observation times for the biweekly schedule
+write.csv(Finaltidetable, file = paste(SDalt,"_SealSchedule.csv",sep=""),row.names=FALSE)
+
+
+############################ SECTION 2: AFTER EMAILS WITH TIMES FILLED OUT HAVE BEEN RECIEVED ################################
+setwd("~/Downloads")
+
+Schedule <- Finaltidetable
+Schedule$Observers <- NULL
+
+for(i in 1:length(FieldObservers)) {Schedule[,i+4] <- as.data.frame(read.csv(paste(SDalt,"_SealSchedule_",FieldObservers[i],".csv",sep=""))$Observers)}
+
+obnumbers <- "(this can be anything)"
+for(i in 1:length(FieldObservers)){obnumbers[i] <- c(paste("Observer",i,sep=""))}
+
+names(Schedule) <- c("Date","Day","High_Low","Times",obnumbers)
+
+View(Schedule)
