@@ -1,0 +1,229 @@
+#Enter your name within quotations (1 space, capital letters):
+Lab_Member <- "Daniel Woodrich"
+
+#Enter your desired quarter and years to sum up hours for within quotations. Format: first three letters of season in lowercase, and the full year, seperated with an underscore "sss_yyyy" . Ex: "spr_2015"
+#For dummy dataset, use "fal_2015"
+
+Quarter_and_Year <- "fal_2015" 
+
+#DCS stands for data compilation sheet
+#1st dummy dataset https://www.dropbox.com/s/n4bpblnj1aucylf/Data_compilation_sheet_DUMMY.csv?dl=0
+
+DCS <- read.csv(file.choose())
+
+#LAC stands for lab activity record
+#2nd dummy dataset https://www.dropbox.com/s/zoi2kzaplf1a2vv/Lab_activity_record_DUMMY.csv?dl=0
+LAC <- read.csv(file.choose())
+
+
+-----------------------------------------
+if(Lab_Member == "Nolan Newman"){
+  Member_initial <- "NN"
+}
+
+if(Lab_Member == "Daniel Woodrich"){
+  Member_initial <- "DW"
+}
+
+if(Lab_Member == "Raven Benko"){
+  Member_initial <- "RB"
+}
+
+if(Lab_Member == "Hannah Burley"){
+  Member_initial <- "HB"
+}
+
+if(Lab_Member == "Erin M"){
+  Member_initial <- "EM"
+}
+
+if(Lab_Member == "Skye French"){
+  Member_initial <- "SF"
+}
+
+if(Lab_Member == "Jessica Kerby"){
+  Member_initial <- "JK"
+}
+
+if(Lab_Member == "Kinsi Clarke"){
+  Member_initial <- "KC"
+}
+
+if(Lab_Member == "Rachel Wachtendonk"){
+  Member_initial <- "RW"
+}
+
+
+
+DCS$Date <- as.character(DCS$Date)
+Month <- t(as.data.frame(strsplit(DCS$Date,split="/"))[1,])
+Day <- t(as.data.frame(strsplit(DCS$Date,split="/"))[2,])
+DCS$Month_and_Day <- paste(Month,Day,sep="/")
+
+#character string for summer
+summer <- as.character(seq(as.Date("2000/6/15"),as.Date("2000/9/24"),by="day"))
+summer_month <- t(as.data.frame(strsplit(summer,split="-"))[2,])
+summer_day <- t(as.data.frame(strsplit(summer,split="-"))[3,])
+
+summer <- paste(summer_month,summer_day,sep="/")
+
+#character string for fall
+fall <- as.character(seq(as.Date("2000/9/25"),as.Date("2000/12/31"),by="day"))
+fall_month <- t(as.data.frame(strsplit(fall,split="-"))[2,])
+fall_day <- t(as.data.frame(strsplit(fall,split="-"))[3,])
+
+fall <- paste(fall_month,fall_day,sep="/")
+
+#character string for winter
+winter <- as.character(seq(as.Date("2000/1/1"),as.Date("2000/3/21"),by="day"))
+winter_month <- t(as.data.frame(strsplit(winter,split="-"))[2,])
+winter_day <- t(as.data.frame(strsplit(winter,split="-"))[3,])
+
+winter <- paste(winter_month,winter_day,sep="/")
+
+#character string for spring, compared to Month_and_Day to make new "Quarter Column"
+spring <- as.character(seq(as.Date("2000/3/22"),as.Date("2000/6/14"),by="day"))
+spring_month <- t(as.data.frame(strsplit(spring,split="-"))[2,])
+spring_day <- t(as.data.frame(strsplit(spring,split="-"))[3,])
+
+spring <- paste(spring_month,spring_day,sep="/")
+
+
+
+DCS$Quarter <- ""
+
+for(n in 1:length(DCS$Month_and_Day)){
+  if (any(grepl(DCS$Month_and_Day[n],summer),na.rm=FALSE))
+    DCS$Quarter[n] <- "sum"
+  if (any(grepl(DCS$Month_and_Day[n],winter),na.rm=FALSE))
+    DCS$Quarter[n] <- "win"
+  if (any(grepl(DCS$Month_and_Day[n],fall),na.rm=FALSE))
+    DCS$Quarter[n] <- "fal" 
+  if (any(grepl(DCS$Month_and_Day[n],spring),na.rm=FALSE))
+    DCS$Quarter[n] <- "spr"
+} 
+
+#format year
+DCS$Year <- t(as.data.frame(strsplit(DCS$Date,split="/"))[3,])
+DCS$Year <- paste("20",DCS$Year,sep="")
+
+
+DCS$Qua_Year <- paste(DCS$Quarter,DCS$Year,sep="_")
+
+DCS_QY <- subset(DCS, DCS$Qua_Year == Quarter_and_Year)
+
+DCS_labmem <- subset(DCS_QY, grepl(Member_initial,DCS_QY$Observers))
+#Sum up hours for DCS
+Field_hours <- ((length(DCS_labmem$Year) - length(unique(DCS_labmem$Date))) * 0.5)
+
+#Do the same for Lab activity sheet
+LAC <- read.csv("H:/Whatcom Creek Seals/Scripts and Analysis/R scipt csv files/201510_Lab_Activity_Record.csv")
+
+LAC$Date <- as.character(LAC$Date)
+Month <- t(as.data.frame(strsplit(LAC$Date,split="/"))[1,])
+Day <- t(as.data.frame(strsplit(LAC$Date,split="/"))[2,])
+LAC$Month_and_Day <- paste(Month,Day,sep="/")
+
+#use previously stored ranges for each quarter
+
+LAC$Quarter <- ""
+
+for(n in 1:length(LAC$Month_and_Day)){
+  if (any(grepl(LAC$Month_and_Day[n],summer),na.rm=FALSE))
+    LAC$Quarter[n] <- "sum"
+  if (any(grepl(LAC$Month_and_Day[n],winter),na.rm=FALSE))
+    LAC$Quarter[n] <- "win"
+  if (any(grepl(LAC$Month_and_Day[n],fall),na.rm=FALSE))
+    LAC$Quarter[n] <- "fal" 
+  if (any(grepl(LAC$Month_and_Day[n],spring),na.rm=FALSE))
+    LAC$Quarter[n] <- "spr"
+} 
+
+#format year
+LAC$Year <- t(as.data.frame(strsplit(LAC$Date,split="/"))[3,])
+LAC$Year <- paste("20",LAC$Year,sep="")
+
+
+LAC$Qua_Year <- paste(LAC$Quarter,LAC$Year,sep="_")
+
+LAC_QY <- subset(LAC, LAC$Qua_Year == Quarter_and_Year)
+
+#Sum up hours for LAC
+
+LAC_labmem <- subset(LAC_QY, grepl(Lab_Member,LAC_QY$Lab_member))
+Lab_Hours <- sum(LAC_labmem$Hours_estimate)
+
+#total hours:
+Total_Hours <- (Field_hours + Lab_Hours)
+print(Total_Hours)
+
+
+###################################### STOP SCRIPT HERE FOR TOTAL HOURS IN A QUARTER##################################
+
+
+#total hours on record (ever)
+
+labmem_all_hours <- subset(DCS, grepl(Member_initial, DCS$Observers))
+Field_hours_all <- ((length(labmem_all_hours$Year) - length(unique(labmem_all_hours$Date))) * 0.5)
+print(Field_hours_all)
+
+############################STOP SCRIPT HERE FOR ALL HOURS FROM FIELD FOR OBSERVER#################################
+
+data.frame(grepl(Member_initial, DCS$Observers),DCS$Observers,DCS$Qua_Year)
+
+########################### STOP SCRIPT HERE FOR DOUBLE CHECK ON HOURS ############################################
+
+
+install.packages(stringr)
+library(stringr)
+
+
+
+DCS_Ob_split <- str_split_fixed(as.character(DCS$Observers),",",3)
+
+All_Observers <- c(unique(str_trim(DCS_Ob_split[,1])),unique(str_trim(DCS_Ob_split[,2])),unique(str_trim(DCS_Ob_split[,3])))
+
+All_Observers <- unique(All_Observers)
+
+
+All_Total_Hours <- ""
+for(n in 1:length(All_Observers)){
+  labmem_all_hours1 <- subset(DCS, grepl(All_Observers[n], DCS$Observers))
+  Field_hours_all1 <- ((length(labmem_all_hours1$Year) - length(unique(labmem_all_hours1$Date))) * 0.5)
+  All_Total_Hours[n] <- Field_hours_all1
+}
+
+Hours_History <- data.frame(All_Observers, as.numeric(All_Total_Hours))
+Hours_History <- Hours_History[rev(sort.list(Hours_History$as.numeric.All_Total_Hours.)),]
+Hours_History <- Hours_History[c(2:length(Hours_History$All_Observers)),]
+names(Hours_History) <- c("All_Observers", "All_Total_Hours")
+print(Hours_History)
+############################ STOP HERE FOR EVERYONE's FIELD HOURS THROUGHOUT RECORDED HISTORY ########################
+
+#interface in development
+library('gWidgets')
+
+w <- gwindow("Button examples")
+g <- ggroup(container = w)
+addSpring(g)   ## push to right of widget
+gbutton("help", container = g)
+addSpace(g, 20) ## some breathing room
+gbutton("cancel", container = g)
+gbutton("ok", container = g, handler = function(h, ...) cat("do it\n"))
+
+gbutton("test")
+namefun <- function(){
+  x <- readline("name in format: Firstname Lastname")
+  return(Lab_Member <- x)
+  return(Lab_Member)
+}
+
+QYfun <-  function(){
+  x <- readline("Desired Quarter and Year in format xxx_YYYY: (xxx can be Fal,Win,Spr,Sum)")
+  return(Quarter_and_Year <- x)
+  return(Quarter_and_Year)
+}
+
+Lab_Member <- namefun()
+
+Quarter_and_Year <- QYfun()
