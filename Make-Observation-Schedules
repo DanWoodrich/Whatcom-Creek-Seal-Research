@@ -2,6 +2,12 @@
 #Dataset download: https://www.dropbox.com/s/c936b8rvw3as8ux/TideData2016.csv?dl=0
 tidedata <- read.csv(file.choose())
 
+#Folder that schedule will save to: 
+getwd()
+
+#change folder that schedule will save to (upt full file path in quotation marks within paranthesis, remove number sign to activate):
+#setwd()
+
 ############RUN ALL UNTIL SECTION 2##################
 #Roster. Can be manipulated as people enter/leave project and script will still function
 
