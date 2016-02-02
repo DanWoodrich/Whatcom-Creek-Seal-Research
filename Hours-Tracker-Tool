@@ -113,7 +113,7 @@ DCS$Qua_Year <- paste(DCS$Quarter,DCS$Year,sep="_")
 DCS_QY <- subset(DCS, DCS$Qua_Year == Quarter_and_Year)
 
 DCS_labmem <- subset(DCS_QY, grepl(Member_initial,DCS_QY$Observers))
-#Sum up hours for DCS
+#Sum up hours for DCS: in the normal dataset, each observation has 1 entry that doesn't correspond to 30 minutes like the rest (time 0 observation). I remove these initial observations by subtracting the number of unique observations from the total number of observations so I can times the remainder by 0.5 to get hours.
 Field_hours <- ((length(DCS_labmem$Year) - length(unique(DCS_labmem$Date))) * 0.5)
 
 #Do the same for Lab activity sheet
